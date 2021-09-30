@@ -11,17 +11,15 @@ const guardarCliente = async () => {
     }
     //Se insertan los datos
     await db.collection("Clientes").doc().set(unCliente)
-    //Vaciar los input 
-    document.getElementById("inp_nom").value= '';
-    document.getElementById("inp_ape").value= '';
-    document.getElementById("inp_dni").value= '';
     listar_clientes();
+    vaciar();
 }
 const boton = document.getElementById("btn_obtener")
 boton.addEventListener("click",guardarCliente)
 
 //eliminar cliente
-function eliminar(id){
+function eliminar(){
+    const id = document.getElementById("inp_id").value
     db.collection("Clientes").doc(id).delete()
     listar_clientes();
 }
@@ -43,7 +41,9 @@ const listar_clientes = async() =>{
                 <td>${element.apellido}</td> 
                 <td>${element.dni}</td> 
                 <td>
-                <button onclick="eliminar('${element.id}')"class="btn btn-danger btn-sa"> <i class="fa fa-trash"></i> </button>
+                <button onclick="llenar_input_oculto('${element.id}')" data-bs-toggle="modal" data-bs-target="#exampleModal" "class="btn btn-danger btn-sa"> <i class="fa fa-trash"></i> </button>
+                <button onclick="editar_cliente('${element.nombre}','${element.apellido}',${element.dni},'${element.id}')"class="btn btn-success btn-sm"> <i class="fa fa-edit"></i> </button>
+                
                 </td> 
             </tr>     
         `
@@ -53,3 +53,37 @@ const listar_clientes = async() =>{
 }
 //ejercutar funcion
 listar_clientes()
+
+function llenar_input_oculto(id){
+    document.getElementById("inp_id").value = id;
+}
+
+function editar_cliente(nom,ape,dni,id){
+    document.getElementById("inp_nom").value = nom;
+    document.getElementById("inp_ape").value = ape;
+    document.getElementById("inp_dni").value = dni;
+    document.getElementById("inp_id").value = id;
+} 
+function actualizar_cliente(){
+    const nom = document.getElementById("inp_nom").value
+    const ape = document.getElementById("inp_ape").value
+    const dni = document.getElementById("inp_dni").value
+    const id = document.getElementById("inp_id").value
+    const clienteActualizado = {
+        nombre:nom,
+        apellido:ape,
+        dni:dni,
+    }
+    db.collection("Clientes").doc(id).update(clienteActualizado);
+    //Refrescar la tabla
+    listar_clientes();
+    //Vaciar el formulario
+    vaciar();
+}
+function vaciar(){
+    document.getElementById("inp_nom").value = '';
+    document.getElementById("inp_ape").value = '';
+    document.getElementById("inp_dni").value = '';
+    document.getElementById("inp_id").value = '';
+
+}
